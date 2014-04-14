@@ -1,8 +1,7 @@
 import random
 
 #variables to decide how the AI should change strategies according to player move  
-firstTurn=0
-secondTurn=0
+global firstTurn, secondTurn, nofturns
 
 def gameBoard(board): 
     print("\n %s| %s| %s" % (board[7],board[8],board[9]))
@@ -49,7 +48,7 @@ def randomMove(board, movesList): #random move which arises due to symmetry of t
         return random.choice(moves)
     else:
         return None
-	
+
 def getPlayerMove(board): #input from player
     move = ' '
     while move not in '1 2 3 4 5 6 7 8 9'.split() or not isFree(board, int(move)):
@@ -60,9 +59,19 @@ def getPlayerMove(board): #input from player
 def getComputerMove(board, cletter): #the AI part!
     cletter == 'O'
     pletter = 'X'
-    global firstTurn, secondTurn
-
+    global firstTurn, secondTurn, initurn, nofturns
+    moved = list()
+    possible = list()
     # priority order - 1)see if computer can win 2)see if player can win next turn 3) player first turn condition 4) corners > center > edges
+    for i in [1,2,3,4,5,6,7,8,9]:
+        if not(isFree(board,i)):
+            moved.append(i)
+            continue
+        possible.append(i)
+        continue
+    if len(possible) == 1:
+        return possible[0]
+
     for x in range(1, 10):
         copy = getBoard(board)
         if isFree(copy, x):
@@ -80,24 +89,43 @@ def getComputerMove(board, cletter): #the AI part!
     cornerMove = not(isFree(board,1) and isFree(board,3) and isFree(board,7) and isFree(board,9))
     edgeMove = not(isFree(board,2) and isFree(board,4) and isFree(board,8) and isFree(board,6))
     cornerMove2 = (not(isFree(board,1) or isFree(board,9))) or (not(isFree(board,3) or isFree(board,7)))
-	
+    if firstTurn == 3 and initurn == 1 and nofturns <= 5:
+        for i in [1,3,7,9]:
+           for j in [2,4,6,8]:
+                if not(isFree(board,i)):
+                    if not(isFree(board,j)):
+                        if j == 2:
+                            return randomMove(board, [1,3])
+                        if j == 4:
+                            return randomMove(board, [1,7])
+                        if j == 6:
+                            return randomMove(board, [3,9])
+                        if j == 8:
+                            return randomMove(board, [7,9])
+        for i in [2,8]:
+            for j in [4,6]:
+                if not(isFree(board,i)):
+                    if not(isFree(board,j)):
+                        if j == 4:
+                            return randomMove(board, [1,7])
+                        if j == 6:
+                            return randomMove(board, [3,9])
     if firstTurn==0 and cornerMove:
-        firstTurn=1
+        firstTurn=3
         secondTurn=1
         return 5
+    if firstTurn==0 and edgeMove:
+        firstTurn=3
+        return 5
+    firstTurn=3   #Single line change.
     if secondTurn==1 and cornerMove2:
         secondTurn=2
         return randomMove(board, [2,4,8,6])
-    if firstTurn==0 and edgeMove:
-	    firstTurn=3
-	    return 5
     move = randomMove(board, [1, 3, 7, 9])
     if move != None:
         return move
-    
     if isFree(board, 5):
         return 5
-
     return randomMove(board, [2, 4, 8, 6])
 
 def isFull(board): #checks whether board is filled at end of the game
@@ -106,35 +134,21 @@ def isFull(board): #checks whether board is filled at end of the game
             return False
     return True
 
-#yes, yes, your computer is quite surely slow enough for this to work.
-load = 0
-print("Game Loading")
-while (load < 5000000):
-	load += 1
-print(".")
-load = 0
-while (load < 5000000):
-	load += 1
-print("...")
-load = 0
-while (load < 5000000):
-	load += 1
-print(".....")
-while (load < 5000000):
-	load += 1
-
 print("\nTIC TAC TOE!")
 print("Instructions : You are X, computer is O. Please follow numeric keypad layout to select your move.")
 
 while True:
+    firstTurn = 0
+    secondTurn = 0
+    nofturns = 0
     board = [' '] * 10
     pletter = 'X'
     cletter = 'O'
-    turn = first()
-
+    initurn = first()
     game = True
-
+    turn = initurn
     while game: #and it begins!
+        nofturns = nofturns + 1
         if turn == 1:
             #player's turn
             gameBoard(board)
@@ -149,7 +163,7 @@ while True:
             else:
                 if isFull(board):
                     gameBoard(board)
-                    print("It's a draw!\n\n New game"); firstTurn=0
+                    print("It's a draw!\n\n New game")
                     break
                 else:
                     turn = 0
@@ -157,7 +171,6 @@ while True:
         else:
             #computer's turn
             move = getComputerMove(board, cletter)
-            firstTurn=1 
             makeMove(board, cletter, move)
 
             if checkWin(board, cletter):
@@ -168,7 +181,7 @@ while True:
             else:
                 if isFull(board):
                     gameBoard(board)
-                    print("It's a draw!\n\n New game"); firstTurn=0
+                    print("It's a draw!\n\n New game")
                     break
                 else:
                     turn = 1

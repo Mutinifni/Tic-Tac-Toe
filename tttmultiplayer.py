@@ -53,7 +53,7 @@ while (moves < 9):
 		moves += 1
 		turn = 1
 			
-if result == True:
+if result:
 	print("Congratulations", winner,"You win!\n")
 else:
 	print("It's a draw!\n")

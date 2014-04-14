@@ -6,7 +6,9 @@ Coding the classic game.
 
 Console Variations :
 
-=> Vs players - tttmultiplayer.py
-=> Vs computer - tttai.py
+1) Vs players - tttmultiplayer.py
 
-Coded in Python 3.3
+2) Vs computer - tttai.py
+
+
+>Coded in Python 3.3
